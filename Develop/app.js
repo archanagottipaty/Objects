@@ -10,7 +10,7 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-const employees = [];
+ const employees = [];
 
 const writeFile = () => {
   const data = render(employees);
@@ -45,7 +45,7 @@ const askQuestions = () => {
             const manager = new Manager(name, id, email, office);
             employees.push(manager);
             console.log("Employees employees.push():" + JSON.stringify(employees));
-            writeFile();
+            // writeFile();
           })
             break;
           case "Engineer":
@@ -70,9 +70,11 @@ const askQuestions = () => {
           if (answer == true) {
             askQuestions();
           } else {
-            console.log("Employees else():" + JSON.stringify(employees));
+            console.log("Employees before writeFile():" + JSON.stringify(employees));
             writeFile();
+            console.log("Employees after writeFile():" + JSON.stringify(employees));
           }
+
         });
       });     
       //  Ask one more Question: Do u want to ake another role?
