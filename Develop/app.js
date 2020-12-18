@@ -11,21 +11,111 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
 const employees = [];
+
 const writeFile = () => {
   const data = render(employees);
-  fs.writeFileSync(outputPath, data, (err) => {
-    if (err) throw err;
-    console.log("file written.");
-  });
+  console.log("Inside writefile");
+  console.log("output dir" + OUTPUT_DIR );
+    if (!fs.existsSync(OUTPUT_DIR)) {
+      fs.mkdirSync(OUTPUT_DIR);
+    }
+    fs.writeFileSync(outputPath, data, (err) => {
+      if (err) throw err;
+      console.log("file written.");
+    });
+}
+
+
+const askQuestions = () => {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "role",
+        message: "What is your role?",
+        choices: ["Manager", "Engineer", "Intern"],
+      },
+    ])
+    .then((data) => {
+      askCommonQuestions().then(({name, id, email})=>{
+        switch (data.role) {
+          case "Manager":
+            askManagerQuestion().then(({office}) => {
+            const manager = new Manager(name, id, email, office);
+            employees.push(manager);})
+            break;
+          case "Engineer":
+            askEngineerQuestion().then(({github}) => {
+              const engineer = new Engineer(name, id, email, github);
+            employees.push(engineer);})
+            break;
+          case "Intern":
+            break;
+          default:
+        }
+        inquirer
+        .prompt([
+          {
+            type: "confirm",
+            name: "answer",
+            message: "Do you want to create another role?",
+          },
+        ])
+        .then(({ answer }) => {
+          console.log({answer});
+          if (answer === true) {
+            askQuestions();
+          } else {
+            
+            writeFile();
+          }
+        });
+      });     
+      //  Ask one more Question: Do u want to ake another role?
+    });
 };
-fs.fetchData(outputPath, data, (err,data) => {
-    if (err) throw err;
-    console.log("file written.");
-  });
+askQuestions();
 
-  const data = await fetchdata(outputpath,data)
+const askManagerQuestion = () => {
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "office",
+      message: "What is your Office Number?",
+    },
+  ]);
+};
 
-  
+const askEngineerQuestion = () => {
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "github",
+      message: "What is your GitHub URL?",
+    },
+  ]);
+};
+
+const askCommonQuestions = () => {
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "What is your Name?",
+    },
+    {
+      type: "input",
+      name: "id",
+      message: "What is your Id?",
+    },
+    {
+      type: "input",
+      name: "email",
+      message: "What is your email?",
+    },
+  ]);
+};
+
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
 
