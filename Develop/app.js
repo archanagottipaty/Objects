@@ -14,8 +14,9 @@ const employees = [];
 
 const writeFile = () => {
   const data = render(employees);
+   console.log("Employees writefile() app.js:" + JSON.stringify(employees));
   console.log("Inside writefile");
-  console.log("output dir" + OUTPUT_DIR );
+  console.log("output dir: " + OUTPUT_DIR );
     if (!fs.existsSync(OUTPUT_DIR)) {
       fs.mkdirSync(OUTPUT_DIR);
     }
@@ -42,7 +43,10 @@ const askQuestions = () => {
           case "Manager":
             askManagerQuestion().then(({office}) => {
             const manager = new Manager(name, id, email, office);
-            employees.push(manager);})
+            employees.push(manager);
+            console.log("Employees employees.push():" + JSON.stringify(employees));
+            writeFile();
+          })
             break;
           case "Engineer":
             askEngineerQuestion().then(({github}) => {
@@ -63,10 +67,10 @@ const askQuestions = () => {
         ])
         .then(({ answer }) => {
           console.log({answer});
-          if (answer === true) {
+          if (answer == true) {
             askQuestions();
           } else {
-            
+            console.log("Employees else():" + JSON.stringify(employees));
             writeFile();
           }
         });
