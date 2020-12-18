@@ -14,15 +14,15 @@ const render = require("./lib/htmlRenderer");
 
 const writeFile = () => {
   const data = render(employees);
-   console.log("Employees writefile() app.js:" + JSON.stringify(employees));
-  console.log("Inside writefile");
-  console.log("output dir: " + OUTPUT_DIR );
+   console.log("Employees writefile() app.js line 17:" + JSON.stringify(employees));
+  console.log("Inside writefile app.js line 18");
+  console.log("output dir:  app.js line 19" + OUTPUT_DIR );
     if (!fs.existsSync(OUTPUT_DIR)) {
       fs.mkdirSync(OUTPUT_DIR);
     }
     fs.writeFileSync(outputPath, data, (err) => {
       if (err) throw err;
-      console.log("file written.");
+      console.log(" app.js line 25, file written.");
     });
 }
 
@@ -44,7 +44,7 @@ const askQuestions = () => {
             askManagerQuestion().then(({office}) => {
             const manager = new Manager(name, id, email, office);
             employees.push(manager);
-            console.log("Employees employees.push():" + JSON.stringify(employees));
+            console.log("Employees employees.push() app.js line 47:" + JSON.stringify(employees));
             // writeFile();
           })
             break;
@@ -66,13 +66,13 @@ const askQuestions = () => {
           },
         ])
         .then(({ answer }) => {
-          console.log({answer});
+          console.log("app.js line 69: " + {answer});
           if (answer == true) {
             askQuestions();
           } else {
-            console.log("Employees before writeFile():" + JSON.stringify(employees));
+            console.log("Employees before app.js writeFile() line 73 :" + JSON.stringify(employees));
             writeFile();
-            console.log("Employees after writeFile():" + JSON.stringify(employees));
+            console.log("Employees after app.js writeFile() line 75:" + JSON.stringify(employees));
           }
 
         });
