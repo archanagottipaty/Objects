@@ -11,6 +11,7 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
 const employees = [];
+let managerSelect = false;
 
 const writeFile = () => {
   const data = render(employees);
@@ -44,10 +45,30 @@ const askQuestions = () => {
     });
 };
 
+const askQuestionsWithoutManager = () => {
+  //console.log("askQuestions line 31")
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "role",
+        message: "What is your role?",
+        choices: [ "Engineer", "Intern"],
+      },
+    ])
+    .then((data) => {
+      askCommonQuestions().then(({ name, id, email }) => {
+        switchRole(data.role,name,id,email);
+      });
+    });
+};
+
+
 const switchRole = (role, name,id,email) => {
   //console.log("askCommonQuestions()line 43")
   switch (role) {
     case "Manager":
+      managerSelect = true;
       console.log("Ask manager question, Line 63");
       askManagerQuestion().then(({ office }) => {
         //console.log("askManagerQuestion() line 47")
@@ -66,11 +87,12 @@ const switchRole = (role, name,id,email) => {
       });
       break;
     case "Intern":
-      // askInternQuestion().then(({ github }) => {
-      //   const intern = new Intern(name, id, email, github);
-      //   employees.push(engineer);
+       askInternQuestion().then(({ school }) => {
+        const intern = new Intern(name, id, email, school);
+         employees.push(intern);
 
       askAnotherRole();
+    });
       break;
     default:
   }
@@ -86,9 +108,16 @@ const askAnotherRole = () => {
     ])
     .then(({ answer }) => {
       //console.log(`app.js line 73:` + {answer});
-      if (answer == true) {
+      
+       if (managerSelect == true && answer == true){
+        askQuestionsWithoutManager();
+      }
+
+      else if (answer == true) {
         askQuestions();
-      } else {
+      } 
+      
+      else {
         //console.log("Employees before app.js writeFile() line 76 :" + JSON.stringify(employees));
         writeFile();
         //console.log("Employees after app.js writeFile() line 78:" + JSON.stringify(employees));
@@ -115,6 +144,15 @@ const askEngineerQuestion = () => {
   ]);
 };
 
+const askInternQuestion = () => {
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "school",
+      message: "What is your School name?",
+    },
+  ]);
+};
 const askCommonQuestions = () => {
   return inquirer.prompt([
     {
