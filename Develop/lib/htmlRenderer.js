@@ -5,7 +5,7 @@ const templatesDir = path.resolve(__dirname, "../templates");
 
 const render = employees => {
   const html = [];
-  console.log("Employees htmlRenderer.js:" + employees);
+  console.log("Employees htmlRenderer.js line 8:" + employees);
 
   html.push(...employees
     .filter(employee => employee.getRole() === "Manager")

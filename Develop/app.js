@@ -10,24 +10,24 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
- const employees = [];
+const employees = [];
 
 const writeFile = () => {
   const data = render(employees);
-   console.log("Employees writefile() app.js line 17:" + JSON.stringify(employees));
-  console.log("Inside writefile app.js line 18");
-  console.log("output dir:  app.js line 19" + OUTPUT_DIR );
-    if (!fs.existsSync(OUTPUT_DIR)) {
-      fs.mkdirSync(OUTPUT_DIR);
-    }
-    fs.writeFileSync(outputPath, data, (err) => {
-      if (err) throw err;
-      console.log(" app.js line 25, file written.");
-    });
-}
-
+  //console.log("Employees writefile() app.js line 17:" + JSON.stringify(employees));
+  //console.log("Inside writefile app.js line 18");
+  //console.log("output dir:  app.js line 19" + OUTPUT_DIR );
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR);
+  }
+  fs.writeFileSync(outputPath, data, (err) => {
+    if (err) throw err;
+    //console.log(" app.js line 25, file written.");
+  });
+};
 
 const askQuestions = () => {
+  //console.log("askQuestions line 31")
   inquirer
     .prompt([
       {
@@ -38,50 +38,63 @@ const askQuestions = () => {
       },
     ])
     .then((data) => {
-      askCommonQuestions().then(({name, id, email})=>{
-        switch (data.role) {
-          case "Manager":
-            askManagerQuestion().then(({office}) => {
-            const manager = new Manager(name, id, email, office);
-            employees.push(manager);
-            console.log("Employees employees.push() app.js line 47:" + JSON.stringify(employees));
-            // writeFile();
-          })
-            break;
-          case "Engineer":
-            askEngineerQuestion().then(({github}) => {
-              const engineer = new Engineer(name, id, email, github);
-            employees.push(engineer);})
-            break;
-          case "Intern":
-            break;
-          default:
-        }
-        inquirer
-        .prompt([
-          {
-            type: "confirm",
-            name: "answer",
-            message: "Do you want to create another role?",
-          },
-        ])
-        .then(({ answer }) => {
-          console.log("app.js line 69: " + {answer});
-          if (answer == true) {
-            askQuestions();
-          } else {
-            console.log("Employees before app.js writeFile() line 73 :" + JSON.stringify(employees));
-            writeFile();
-            console.log("Employees after app.js writeFile() line 75:" + JSON.stringify(employees));
-          }
-
-        });
-      });     
-      //  Ask one more Question: Do u want to ake another role?
+      askCommonQuestions().then(({ name, id, email }) => {
+        switchRole(data.role,name,id,email);
+      });
     });
 };
-askQuestions();
 
+const switchRole = (role, name,id,email) => {
+  //console.log("askCommonQuestions()line 43")
+  switch (role) {
+    case "Manager":
+      console.log("Ask manager question, Line 63");
+      askManagerQuestion().then(({ office }) => {
+        //console.log("askManagerQuestion() line 47")
+        const manager = new Manager(name, id, email, office);
+        employees.push(manager);
+        askAnotherRole();
+        //console.log("Employees employees.push() app.js line 50:" + JSON.stringify(employees));
+        // writeFile();
+      });
+      break;
+    case "Engineer":
+      askEngineerQuestion().then(({ github }) => {
+        const engineer = new Engineer(name, id, email, github);
+        employees.push(engineer);
+        askAnotherRole();
+      });
+      break;
+    case "Intern":
+      // askInternQuestion().then(({ github }) => {
+      //   const intern = new Intern(name, id, email, github);
+      //   employees.push(engineer);
+
+      askAnotherRole();
+      break;
+    default:
+  }
+};
+const askAnotherRole = () => {
+  inquirer
+    .prompt([
+      {
+        type: "confirm",
+        name: "answer",
+        message: "Do you want to create another role?",
+      },
+    ])
+    .then(({ answer }) => {
+      //console.log(`app.js line 73:` + {answer});
+      if (answer == true) {
+        askQuestions();
+      } else {
+        //console.log("Employees before app.js writeFile() line 76 :" + JSON.stringify(employees));
+        writeFile();
+        //console.log("Employees after app.js writeFile() line 78:" + JSON.stringify(employees));
+      }
+    });
+};
 const askManagerQuestion = () => {
   return inquirer.prompt([
     {
@@ -121,6 +134,8 @@ const askCommonQuestions = () => {
     },
   ]);
 };
+let role = askQuestions();
+switchRole(role);
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
