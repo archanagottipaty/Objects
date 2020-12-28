@@ -11,24 +11,23 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
 const employees = [];
-let managerSelect = false;
+let managerSelect = false; //Boolean which is checked to see if Manager is already selected
 
+
+//function that writes tthe team.html file in the output dir
 const writeFile = () => {
   const data = render(employees);
-  //console.log("Employees writefile() app.js line 17:" + JSON.stringify(employees));
-  //console.log("Inside writefile app.js line 18");
-  //console.log("output dir:  app.js line 19" + OUTPUT_DIR );
+  
   if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR);
   }
   fs.writeFileSync(outputPath, data, (err) => {
     if (err) throw err;
-    //console.log(" app.js line 25, file written.");
   });
 };
 
+//Function that asks the initial question
 const askQuestions = () => {
-  //console.log("askQuestions line 31")
   inquirer
     .prompt([
       {
@@ -45,8 +44,8 @@ const askQuestions = () => {
     });
 };
 
+//Function that asks questions when manager is already selected
 const askQuestionsWithoutManager = () => {
-  //console.log("askQuestions line 31")
   inquirer
     .prompt([
       {
@@ -63,20 +62,16 @@ const askQuestionsWithoutManager = () => {
     });
 };
 
-
+//Function that calls ask***Question() depending on selection
 const switchRole = (role, name,id,email) => {
-  //console.log("askCommonQuestions()line 43")
   switch (role) {
     case "Manager":
       managerSelect = true;
       console.log("Ask manager question, Line 63");
       askManagerQuestion().then(({ office }) => {
-        //console.log("askManagerQuestion() line 47")
         const manager = new Manager(name, id, email, office);
         employees.push(manager);
         askAnotherRole();
-        //console.log("Employees employees.push() app.js line 50:" + JSON.stringify(employees));
-        // writeFile();
       });
       break;
     case "Engineer":
@@ -97,6 +92,8 @@ const switchRole = (role, name,id,email) => {
     default:
   }
 };
+
+//Function that asks if user wants to create another role
 const askAnotherRole = () => {
   inquirer
     .prompt([
@@ -107,8 +104,7 @@ const askAnotherRole = () => {
       },
     ])
     .then(({ answer }) => {
-      //console.log(`app.js line 73:` + {answer});
-      
+    
        if (managerSelect == true && answer == true){
         askQuestionsWithoutManager();
       }
@@ -118,12 +114,11 @@ const askAnotherRole = () => {
       } 
       
       else {
-        //console.log("Employees before app.js writeFile() line 76 :" + JSON.stringify(employees));
         writeFile();
-        //console.log("Employees after app.js writeFile() line 78:" + JSON.stringify(employees));
       }
     });
 };
+//Function that asks the one question specific to managers
 const askManagerQuestion = () => {
   return inquirer.prompt([
     {
@@ -134,6 +129,7 @@ const askManagerQuestion = () => {
   ]);
 };
 
+//Function that asks the one question specific to engineers
 const askEngineerQuestion = () => {
   return inquirer.prompt([
     {
@@ -143,7 +139,7 @@ const askEngineerQuestion = () => {
     },
   ]);
 };
-
+//Function that asks the one question specific to interns
 const askInternQuestion = () => {
   return inquirer.prompt([
     {
@@ -153,6 +149,8 @@ const askInternQuestion = () => {
     },
   ]);
 };
+
+//Function that asks the 3 common questions
 const askCommonQuestions = () => {
   return inquirer.prompt([
     {
@@ -172,6 +170,8 @@ const askCommonQuestions = () => {
     },
   ]);
 };
+
+//These are the two functions called from the global scope, other functions are called from within functions
 let role = askQuestions();
 switchRole(role);
 
